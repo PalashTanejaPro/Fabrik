@@ -420,51 +420,51 @@ def Python(layer):
 
 
 layer_dict = {'Accuracy': Accuracy,
- 'WindowData': WindowData,
- 'Convolution': Convolution,
- 'SoftmaxWithLoss': SoftmaxWithLoss,
- 'InnerProduct':InnerProduct,
- 'HDF5Data': HDF5Data,
- 'Threshold': Threshold,
- 'Deconvolution': Deconvolution,
- 'Embed': Embed,
- 'Log': Log,
- 'Reduction': Reduction,
- 'Slice': Slice,
- 'Eltwise': Eltwise,
- 'Dropout': Dropout,
- 'PReLU': PReLU,
- 'BatchNorm': BatchNorm,
- 'MVN': MVN,
- 'Recurrent': Recurrent,
- 'Bias': Bias,
- 'ContrastiveLoss': ContrastiveLoss,
- 'Input':Input,
- 'Exp': Exp,
- 'ImageData': ImageData,
- 'ReLU': ReLU,
- 'MemoryData': MemoryData,
- 'Crop': Crop,
- 'SPP': SPP,
- 'Pooling': Pooling,
- 'Scale': Scale,
- 'HingeLoss': HingeLoss,
- 'Flatten': Flatten,
- 'ArgMax': ArgMax,
- 'BNLL': BNLL,
- 'Data': Data,
- 'HDF5Output': HDF5Output,
- 'ELU': ELU,
- 'DummyData': DummyData,
- 'InfogainLoss': InfogainLoss,
- 'TanH': TanH,
- 'AbsVal': AbsVal,
- 'Reshape': Reshape,
- 'Power': Power,
- 'Sigmoid': Sigmoid,
- 'Python': Python,
- 'LRN': LRN
- }
+              'WindowData': WindowData,
+              'Convolution': Convolution,
+              'SoftmaxWithLoss': SoftmaxWithLoss,
+              'InnerProduct': InnerProduct,
+              'HDF5Data': HDF5Data,
+              'Threshold': Threshold,
+              'Deconvolution': Deconvolution,
+              'Embed': Embed,
+              'Log': Log,
+              'Reduction': Reduction,
+              'Slice': Slice,
+              'Eltwise': Eltwise,
+              'Dropout': Dropout,
+              'PReLU': PReLU,
+              'BatchNorm': BatchNorm,
+              'MVN': MVN,
+              'Recurrent': Recurrent,
+              'Bias': Bias,
+              'ContrastiveLoss': ContrastiveLoss,
+              'Input': Input,
+              'Exp': Exp,
+              'ImageData': ImageData,
+              'ReLU': ReLU,
+              'MemoryData': MemoryData,
+              'Crop': Crop,
+              'SPP': SPP,
+              'Pooling': Pooling,
+              'Scale': Scale,
+              'HingeLoss': HingeLoss,
+              'Flatten': Flatten,
+              'ArgMax': ArgMax,
+              'BNLL': BNLL,
+              'Data': Data,
+              'HDF5Output': HDF5Output,
+              'ELU': ELU,
+              'DummyData': DummyData,
+              'InfogainLoss': InfogainLoss,
+              'TanH': TanH,
+              'AbsVal': AbsVal,
+              'Reshape': Reshape,
+              'Power': Power,
+              'Sigmoid': Sigmoid,
+              'Python': Python,
+              'LRN': LRN
+              }
 
 
 @csrf_exempt
@@ -509,7 +509,21 @@ def import_prototxt(request):
             else:
                 phase = None
 
-            layer_dict[layer.type](layer)
+            if (layer.type in hasTransformParam):
+                params['scale'] = layer.transform_param.scale
+                params['mirror'] = layer.transform_param.mirror
+                params['crop_size'] = layer.transform_param.crop_size
+                if (layer.transform_param.mean_file != ''):
+                    params['mean_file'] = layer.transform_param.mean_file
+                elif (layer.transform_param.mean_value):
+                    params['mean_value'] = str(
+                        map(int, layer.transform_param.mean_value))[1:-1]
+                params['force_color'] = layer.transform_param.force_color
+                params['force_gray'] = layer.transform_param.force_gray
+
+            if layer.type in layer_dict:
+                layer_dict[layer.type](layer)
+
 
             jsonLayer = {
                 'info': {
@@ -537,13 +551,15 @@ def import_prototxt(request):
                         phase = jsonLayer['info']['phase']
                         for bottomLayerId in blobMap[bottom_blob]:
                             if (net[bottomLayerId]['info']['phase'] == phase) or\
-                                 (net[bottomLayerId]['info']['phase'] is None):
+                                    (net[bottomLayerId]['info']['phase'] is None):
                                 input.append(bottomLayerId)
-                                net[bottomLayerId]['connection']['output'].append(id)
+                                net[bottomLayerId]['connection']['output'].append(
+                                    id)
                     else:
                         for bottomLayerId in blobMap[bottom_blob]:
                             input.append(bottomLayerId)
-                            net[bottomLayerId]['connection']['output'].append(id)
+                            net[bottomLayerId]['connection']['output'].append(
+                                id)
             for top_blob in layer.top:
                 if (top_blob != 'label'):
                     if top_blob in blobMap:
