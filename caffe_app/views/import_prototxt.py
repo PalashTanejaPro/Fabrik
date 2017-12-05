@@ -6,6 +6,8 @@ from caffe.proto import caffe_pb2
 from google.protobuf import text_format
 
 params = {}
+
+
 # ******Data Layers******
 
 
@@ -506,8 +508,6 @@ def import_prototxt(request):
                     phase = None
             else:
                 phase = None
-
-            params = {}
 
             layer_dict[layer.type](layer)
 
