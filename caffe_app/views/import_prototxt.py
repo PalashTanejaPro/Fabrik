@@ -6,8 +6,10 @@ from caffe.proto import caffe_pb2
 from google.protobuf import text_format
 
 params = {}
-#******Data Layers******
-def ImageData():
+# ******Data Layers******
+
+
+def ImageData(layer):
     params['source'] = layer.image_data_param.source
     params['batch_size'] = layer.image_data_param.batch_size
     params['rand_skip'] = layer.image_data_param.rand_skip
@@ -17,7 +19,8 @@ def ImageData():
     params['is_color'] = layer.image_data_param.is_color
     params['root_folder'] = layer.image_data_param.root_folder
 
-def Data():
+
+def Data(layer):
     params['source'] = layer.data_param.source
     params['batch_size'] = layer.data_param.batch_size
     params['backend'] = layer.data_param.backend
@@ -28,18 +31,22 @@ def Data():
     params['rand_skip'] = layer.data_param.rand_skip
     params['prefetch'] = layer.data_param.prefetch
 
-def HDF5Data():
+
+def HDF5Data(layer):
     params['source'] = layer.hdf5_data_param.source
     params['batch_size'] = layer.hdf5_data_param.batch_size
     params['shuffle'] = layer.hdf5_data_param.shuffle
 
-def HDF5Output():
+
+def HDF5Output(layer):
     params['file_name'] = layer.hdf5_output_param.file_name
 
-def Input():
+
+def Input(layer):
     params['dim'] = str(map(int, layer.input_param.shape[0].dim))[1:-1]
 
-def WindowData():
+
+def WindowData(layer):
     params['source'] = layer.window_data_param.source
     params['batch_size'] = layer.window_data_param.batch_size
     params['fg_threshold'] = layer.window_data_param.fg_threshold
@@ -50,18 +57,23 @@ def WindowData():
     params['cache_images'] = layer.window_data_param.cache_images
     params['root_folder'] = layer.window_data_param.root_folder
 
-def MemoryData():
+
+def MemoryData(layer):
     params['batch_size'] = layer.memory_data_param.batch_size
     params['channels'] = layer.memory_data_param.channels
     params['height'] = layer.memory_data_param.height
     params['width'] = layer.memory_data_param.width
 
-def DummyData():
+
+def DummyData(layer):
     params['dim'] = str(map(int, layer.dummy_data_param.shape[0].dim))[1:-1]
     params['type'] = str(layer.dummy_data_param.data_filler[0].type)
 
+
 # ********** Vision Layers **********
-def Convolution():
+
+
+def Convolution(layer):
     if len(layer.convolution_param.kernel_size):
         params['kernel_h'] = layer.convolution_param.kernel_size[0]
         params['kernel_w'] = layer.convolution_param.kernel_size[0]
@@ -90,7 +102,8 @@ def Convolution():
     params['use_bias'] = layer.convolution_param.bias_term
     params['layer_type'] = '2D'
 
-def Pooling():
+
+def Pooling(layer):
     params['pad_h'] = layer.pooling_param.pad_h or layer.pooling_param.pad
     params['pad_w'] = layer.pooling_param.pad_w or layer.pooling_param.pad
     params['stride_h'] = layer.pooling_param.stride_h or layer.pooling_param.stride
@@ -106,17 +119,20 @@ def Pooling():
         params['pool'] = 'STOCHASTIC'
     params['layer_type'] = '2D'
 
-def SPP():
+
+def SPP(layer):
     params['pool'] = layer.spp_param.pool
     params['pyramid_height'] = layer.spp_param.pyramid_height
 
-def Crop():
+
+def Crop(layer):
     if layer.crop_param.axis:
         params['axis'] = layer.crop_param.axis
     if len(layer.crop_param.offset):
         params['offset'] = layer.crop_param.offset[0]
 
-def Deconvolution():
+
+def Deconvolution(layer):
     if len(layer.convolution_param.kernel_size):
         params['kernel_h'] = layer.convolution_param.kernel_size[0]
         params['kernel_w'] = layer.convolution_param.kernel_size[0]
@@ -144,32 +160,45 @@ def Deconvolution():
     params['num_output'] = layer.convolution_param.num_output
     params['use_bias'] = layer.convolution_param.bias_term
 
+
 # ********** Recurrent Layers **********
-def Recurrent():
+
+
+def Recurrent(layer):
     params['num_output'] = layer.recurrent_param.num_output
     params['weight_filler'] = layer.recurrent_param.weight_filler.type
     params['bias_filler'] = layer.recurrent_param.bias_filler.type
     params['debug_info'] = layer.recurrent_param.debug_info
     params['expose_hidden'] = layer.recurrent_param.expose_hidden
+
+
 # ********** Common Layers **********
-def InnerProduct():
+
+
+def InnerProduct(layer):
     params['num_output'] = layer.inner_product_param.num_output
     params['weight_filler'] = layer.inner_product_param.weight_filler.type
     params['bias_filler'] = layer.inner_product_param.bias_filler.type
     params['use_bias'] = layer.inner_product_param.bias_term
 
-def Dropout():
+
+def Dropout(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
 
-def Embed():
+
+def Embed(layer):
     params['bias_term'] = layer.embed_param.bias_term
     params['input_dim'] = layer.embed_param.input_dim
     params['num_output'] = layer.embed_param.num_output
     params['weight_filler'] = layer.embed_param.weight_filler.type
     params['bias_filler'] = layer.embed_param.bias_filler.type
+
+
 # ********** Normalisation Layers **********
-def LRN():
+
+
+def LRN(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
     params['local_size'] = layer.lrn_param.local_size
@@ -181,104 +210,127 @@ def LRN():
     else:
         params['norm_region'] = 'ACROSS_CHANNELS'
 
-def MVN():
+
+def MVN(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
     params['normalize_variance'] = layer.mvn_param.normalize_variance
     params['across_channels'] = layer.mvn_param.across_channels
     params['eps'] = layer.mvn_param.eps
 
-def BatchNorm():
+
+def BatchNorm(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
     params['use_global_stats'] = layer.batch_norm_param.use_global_stats
     params['moving_average_fraction'] = layer.batch_norm_param.moving_average_fraction
     params['eps'] = layer.batch_norm_param.eps
 
+
 # ********** Activation/Neuron Layers **********
-def ReLU():
+
+
+def ReLU(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
     params['negative_slope'] = layer.relu_param.negative_slope
 
-def PReLU():
+
+def PReLU(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
     params['channel_shared'] = layer.prelu_param.channel_shared
 
-def ELU():
+
+def ELU(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
     params['alpha'] = layer.elu_param.alpha
 
-def Sigmoid():
+
+def Sigmoid(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
 
-def TanH():
+
+def TanH(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
 
-def AbsVal():
+
+def AbsVal(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
 
-def Power():
+
+def Power(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
     params['power'] = layer.power_param.power
     params['scale'] = layer.power_param.scale
     params['shift'] = layer.power_param.shift
 
-def Exp():
+
+def Exp(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
     params['base'] = layer.exp_param.base
     params['scale'] = layer.exp_param.scale
     params['shift'] = layer.exp_param.shift
 
-def Log():
+
+def Log(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
     params['base'] = layer.log_param.base
     params['scale'] = layer.log_param.scale
     params['shift'] = layer.log_param.shift
 
-def BNLL():
+
+def BNLL(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
 
-def Threshold():
+
+def Threshold(layer):
     if(layer.top == layer.bottom):
         params['inplace'] = True
     params['threshold'] = layer.threshold_param.threshold
 
-def Bias():
+
+def Bias(layer):
     params['axis'] = layer.bias_param.axis
     params['num_axes'] = layer.bias_param.num_axes
     params['filler'] = layer.bias_param.filler.type
 
-def Scale():
+
+def Scale(layer):
     params['axis'] = layer.scale_param.axis
     params['num_axes'] = layer.scale_param.num_axes
     params['filler'] = layer.scale_param.filler.type
     params['bias_term'] = layer.scale_param.bias_term
     params['bias_filler'] = layer.scale_param.bias_filler.type
 
+
 # ********** Utility Layers **********
-def Flatten():
+
+
+def Flatten(layer):
     params['axis'] = layer.flatten_param.axis
     params['end_axis'] = layer.flatten_param.end_axis
 
-def Reshape():
+
+def Reshape(layer):
     params['dim'] = str(map(int, layer.reshape_param.shape.dim))[1:-1]
 
-def Slice():
+
+def Slice(layer):
     params['slice_point'] = str(map(int, layer.slice_param.slice_point))[1:-1]
     params['axis'] = layer.slice_param.axis
     params['slice_dim'] = layer.slice_param.slice_dim
 
-def Eltwise():
+
+def Eltwise(layer):
     opMap = {
         0: 'Product',
         1: 'Sum',
@@ -289,7 +341,8 @@ def Eltwise():
     else:
         params['layer_type'] = 'Sum'
 
-def Reduction():
+
+def Reduction(layer):
     if layer.reduction_param.operation:
         params['operation'] = layer.reduction_param.operation
         if (params['operation'] == 1):
@@ -305,31 +358,43 @@ def Reduction():
     params['axis'] = layer.reduction_param.axis
     params['coeff'] = layer.reduction_param.coeff
 
-def ArgMax():
+
+def ArgMax(layer):
     params['out_max_val'] = layer.argmax_param.out_max_val
     params['top_k'] = layer.argmax_param.top_k
     params['axis'] = layer.argmax_param.axis
+
+
 # ********** Loss Layers **********
-def InfogainLoss():
+
+
+def InfogainLoss(layer):
     params['source'] = layer.infogain_loss_param.source
     params['axis'] = layer.infogain_loss_param.axis
 
-def SoftmaxWithLoss():
+
+def SoftmaxWithLoss(layer):
     params['axis'] = layer.softmax_param.axis
 
-def HingeLoss():
+
+def HingeLoss(layer):
     params['norm'] = layer.hinge_loss_param.norm
 
-def Accuracy():
+
+def Accuracy(layer):
     params['top_k'] = layer.accuracy_param.top_k
     params['axis'] = layer.accuracy_param.axis
 
-def ContrastiveLoss():
+
+def ContrastiveLoss(layer):
     params['margin'] = layer.contrastive_loss_param.margin
     params['legacy_version'] = layer.contrastive_loss_param.legacy_version
 
+
 # ********** Python Layer **********
-def Python():
+
+
+def Python(layer):
     if (layer.python_param.module):
         params['module'] = layer.python_param.module
     if (layer.python_param.layer):
@@ -350,6 +415,7 @@ def Python():
     for param in params:
         if isinstance(params[param], list):
             params[param] = str(params[param])[1:-1]
+
 
 layer_dict = {'Accuracy': Accuracy,
  'WindowData': WindowData,
@@ -398,6 +464,7 @@ layer_dict = {'Accuracy': Accuracy,
  'LRN': LRN
  }
 
+
 @csrf_exempt
 def import_prototxt(request):
     if request.method == 'POST':
@@ -442,7 +509,7 @@ def import_prototxt(request):
 
             params = {}
 
-            layer_dict[layer.type]()
+            layer_dict[layer.type](layer)
 
             jsonLayer = {
                 'info': {
