@@ -524,7 +524,6 @@ def import_prototxt(request):
             if layer.type in layer_dict:
                 layer_dict[layer.type](layer)
 
-
             jsonLayer = {
                 'info': {
                     'type': layer.type,
