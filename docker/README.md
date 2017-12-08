@@ -1,14 +1,5 @@
 ### How to setup
-1. Clone repo
-    ```
-    git clone ...
-    cd Fabrik
-    ```
-2. Build image
-    ```
-    docker build -t frontend:latest -f ./docker/Dockerfile .
-    ```
-3. Run
+Run from Fabrik root directory
     ```
     docker-compose -f docker/docker-compose.yml up
     ```
