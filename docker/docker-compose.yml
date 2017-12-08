@@ -33,5 +33,5 @@ services:
     - PostgreSQL
     volumes:
     - ../:/code
-    - ./node-js_entrypoint.sh:/node-js_entrypoint.sh
+    - ./nodejs_entrypoint.sh:/node-js_entrypoint.sh
     command: ["bash", "/node-js_entrypoint.sh"]
