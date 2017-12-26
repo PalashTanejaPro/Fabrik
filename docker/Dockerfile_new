@@ -1,0 +1,6 @@
+FROM bvlc/caffe:intel
+ADD common.txt /
+ADD tensorflow_keras_install.sh /
+RUN chmod +x /tensorflow_keras_install.sh
+RUN sh /tensorflow_keras_install.sh
+
