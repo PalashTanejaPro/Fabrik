@@ -8,6 +8,7 @@ import os
 from ide.utils.jsonToPrototxt import json_to_prototxt
 import tensorflow as tf
 import sys
+import json
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, BASE_DIR+'/media/')
 sys.path.insert(0, BASE_DIR+'/tensorflow_app/caffe-tensorflow/')
@@ -25,6 +26,7 @@ def export_to_tensorflow(request):
         if net_name == '':
             net_name = 'Net'
         prototxt, input_dim = json_to_prototxt(net, net_name)
+
         randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
         with open(BASE_DIR+'/media/'+randomId+'.prototxt', 'w') as f:
             f.write(prototxt)
