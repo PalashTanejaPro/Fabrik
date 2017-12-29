@@ -1329,9 +1329,8 @@ def json_to_prototxt(net, net_name):
         layerType = layer['info']['type']
         layerPhase = layer['info']['phase']
 
-        if (layerType == "Input"){
+        if (str(layerType) == "Input"):
             input_dim = layerParams['dim']
-        }
 
         if (not layerParams['caffe']):
             if ('layer_type' in layerParams):
