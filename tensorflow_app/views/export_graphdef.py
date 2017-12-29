@@ -8,7 +8,6 @@ import os
 from ide.utils.jsonToPrototxt import json_to_prototxt
 import tensorflow as tf
 import sys
-import json
 BASE_DIR = os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, BASE_DIR + '/media/')
