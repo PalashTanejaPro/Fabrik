@@ -2,8 +2,6 @@ import caffe
 from caffe import layers as L
 import re
 
-input_dim = None
-
 
 def get_iterable(x):
     return (x,)
@@ -179,8 +177,6 @@ def export_HDF5Output(layerId, layerParams, layerPhase, ns_train, ns_test, blobN
 
 def export_Input(layerId, layerParams, layerPhase, ns_train, ns_test, blobNames):
     input_param = {'shape': {'dim': map(int, layerParams['dim'].split(','))}}
-    global input_dim
-    input_dim = layerParams['dim']
     for ns in (ns_train, ns_test):
         caffeLayer = get_iterable(L.Input(
             input_param=input_param))
@@ -1252,7 +1248,7 @@ def json_to_prototxt(net, net_name):
     # layers name have to be unique
 
     # custom DFS of the network
-
+    input_dim = None
     stack = []
     layersProcessed = {}
     processOrder = []
@@ -1332,6 +1328,10 @@ def json_to_prototxt(net, net_name):
         layerParams = layer['params']
         layerType = layer['info']['type']
         layerPhase = layer['info']['phase']
+
+        if (layerType == "Input"){
+            input_dim = layerParams['dim']
+        }
 
         if (not layerParams['caffe']):
             if ('layer_type' in layerParams):
