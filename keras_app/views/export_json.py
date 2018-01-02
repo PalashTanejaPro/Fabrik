@@ -10,7 +10,8 @@ from django.http import JsonResponse
 from keras.models import Model
 from layers_export import data, convolution, deconvolution, pooling, dense, dropout, embed,\
     recurrent, batch_norm, activation, flatten, reshape, eltwise, concat, upsample, locally_connected,\
-    permute, repeat_vector, regularization, masking, gaussian_noise, gaussian_dropout, alpha_dropout
+    permute, repeat_vector, regularization, masking, gaussian_noise, gaussian_dropout, alpha_dropout, \
+    bidirectional, time_distributed
 BASE_DIR = os.path.dirname(
     os.path.dirname(
         os.path.dirname(
@@ -70,7 +71,9 @@ def export_json(request):
             'GaussianNoise': gaussian_noise,
             'GaussianDropout': gaussian_dropout,
             'AlphaDropout': alpha_dropout,
-            'Scale': ''
+            'Scale': '',
+            'TimeDistributed': time_distributed,
+            'Bidirectional': bidirectional
         }
 
         # Check if conversion is possible

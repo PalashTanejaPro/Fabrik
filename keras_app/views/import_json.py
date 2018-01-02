@@ -7,7 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from layers_import import Input, Convolution, Deconvolution, Pooling, Dense, Dropout, Embed,\
     Recurrent, BatchNorm, Activation, LeakyReLU, PReLU, ELU, Scale, Flatten, Reshape, Concat, \
     Eltwise, Padding, Upsample, LocallyConnected, ThresholdedReLU, Permute, RepeatVector,\
-    ActivityRegularization, Masking, GaussianNoise, GaussianDropout, AlphaDropout
+    ActivityRegularization, Masking, GaussianNoise, GaussianDropout, AlphaDropout, \
+    TimeDistributed, Bidirectional
 from keras.models import model_from_json, Sequential
 
 
@@ -89,7 +90,9 @@ def import_json(request):
         'BatchNormalization': BatchNorm,
         'GaussianNoise': GaussianNoise,
         'GaussianDropout': GaussianDropout,
-        'AlphaDropout': AlphaDropout
+        'AlphaDropout': AlphaDropout,
+        'TimeDistributed': TimeDistributed,
+        'Bidirectional': Bidirectional
     }
 
     hasActivation = ['Conv1D', 'Conv2D', 'Conv3D', 'Conv2DTranspose', 'Dense', 'LocallyConnected1D',

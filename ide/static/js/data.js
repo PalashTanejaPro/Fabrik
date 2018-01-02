@@ -3840,5 +3840,49 @@ export default {
       }
     },
     learn: false
+  },
+  /* ********** Keras Wrappers ********** */
+  TimeDistributed: {
+    name: 'timedist',
+    color: '#d00000',
+    endpoint: {
+      src: ['Bottom'],
+      trg: ['Top']
+    },
+    params: {
+    },
+    props: {
+      name: {
+        name: 'Name',
+        value: '',
+        type: 'text'
+      }
+    },
+    learn: false
+  },
+  Bidirectional: {
+    name: 'bidirect',
+    color: '#d00000',
+    endpoint: {
+      src: ['Bottom'],
+      trg: ['Top']
+    },
+    params: {
+      merge_mode: {
+        name: 'Merge Mode',
+        value: '',
+        type: 'select',
+        options: ['', 'sum', 'mul', 'concat', 'ave'],
+        required: false
+      }
+    },
+    props: {
+      name: {
+        name: 'Name',
+        value: '',
+        type: 'text'
+      }
+    },
+    learn: false
   }
 };
