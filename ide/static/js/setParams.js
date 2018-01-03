@@ -102,7 +102,7 @@ class SetParams extends React.Component {
       return (
         <div className="setparams setparamsActive" >
           <div className="setHead">
-            <h5 className="sidebar-heading">LAYEEER SELECTED</h5>
+            <h5 className="sidebar-heading">LAYER SELECTED</h5>
             <h4>{layer.props.name}</h4>
             <span className="glyphicon glyphicon-remove-sign closeSign" onClick={() => this.close()} aria-hidden="true"></span>
           </div>
