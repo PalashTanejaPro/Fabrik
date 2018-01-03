@@ -572,10 +572,11 @@ def batch_norm(layer, layer_in, layerId, idNext, nextLayer,):
 
 def bidirectional(layer, layer_in, layerId):
     out = {layerId: Bidirectional(layer)(*layer_in)}
-    out = {layerId: TimeDistributed(layer['params']['merge_mode'])(*layer_in)}
+    out = {layerId: Bidirectional(layer['params']['merge_mode'])(*layer_in)}
     return out
 
 def time_distributed(layer, layer_in, layerId):
+    out = {layerId: TimeDistributed(layer)(*layer_in)}
     return out
 
 
