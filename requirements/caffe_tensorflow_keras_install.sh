@@ -35,8 +35,7 @@ echo "Installing Tensorflow dependencies"
 sudo apt-get install python-pip python-dev
 
 echo "Installing Tensorflow"
-pip install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.4.0-cp34-cp34m-linux_x86_64.whl
-pip install protobuf
+pip install tensorflow==1.4.1
 
 echo "#################### Tensorflow Install Complete! ####################"
 
