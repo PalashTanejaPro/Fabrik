@@ -35,7 +35,7 @@ echo "Installing Tensorflow dependencies"
 sudo apt-get install python-pip python-dev
 
 echo "Installing Tensorflow"
-pip install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.1-cp27-none-linux_x86_64.whl
+pip install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.4.0-cp34-cp34m-linux_x86_64.whl
 
 echo "#################### Tensorflow Install Complete! ####################"
 
