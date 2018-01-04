@@ -465,12 +465,16 @@ def Padding(layer):
     params = {'pad': pad}
     return jsonLayer('Pad', params, layer)
 
+
 def TimeDistributed(layer):
     return jsonLayer('TimeDistributed', {}, layer)
 
+
 def Bidirectional(layer):
     params = {}
+    params['merge_mode'] = layer.merge_mode
     return jsonLayer('Bidirectional', params, layer)
+
 
 # ********** Helper functions **********
 

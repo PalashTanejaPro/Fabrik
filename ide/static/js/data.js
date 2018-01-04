@@ -3850,6 +3850,12 @@ export default {
       trg: ['Top']
     },
     params: {
+      caffe: {
+        name: 'Available Caffe',
+        value: false,
+        type: 'checkbox',
+        required: false
+      }
     },
     props: {
       name: {
@@ -3873,6 +3879,12 @@ export default {
         value: '',
         type: 'select',
         options: ['', 'sum', 'mul', 'concat', 'ave'],
+        required: false
+      },
+      caffe: {
+        name: 'Available Caffe',
+        value: false,
+        type: 'checkbox',
         required: false
       }
     },

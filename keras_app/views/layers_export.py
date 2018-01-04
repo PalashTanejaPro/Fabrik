@@ -570,13 +570,20 @@ def batch_norm(layer, layer_in, layerId, idNext, nextLayer,):
                                           scale=False, center=False)(*layer_in)
     return out
 
+
 def bidirectional(layer, layer_in, layerId):
-    out = {layerId: Bidirectional(layer)(*layer_in)}
-    out = {layerId: Bidirectional(layer['params']['merge_mode'])(*layer_in)}
+    if layer['params']['merge_mode'] == '':
+        layer['params']['merge_mode'] = None
+    out = {
+        layerId: Bidirectional(
+            layer=layer_in[0], merge_mode=layer['params']['merge_mode']
+        )
+    }
     return out
 
+
 def time_distributed(layer, layer_in, layerId):
-    out = {layerId: TimeDistributed(layer)(*layer_in)}
+    out = {layerId: TimeDistributed(layer_in[0])}
     return out
 
 
