@@ -143,7 +143,7 @@ def export_json(request):
                         return JsonResponse({'result': 'error', 'error': 'Cannot convert ' +
                                              net[layerId]['info']['type'] + ' to Keras'})
                 else:
-                    if (net[layerId]['info']['type'] in ['TimeDistributed', 'Bidirectional']:
+                    if (net[layerId]['info']['type'] in ['TimeDistributed', 'Bidirectional']):
                         net_out.update(layer_map[net[layerId]['info']['type']](
                             net[layerId], layer_in, layerId, net))
                     else:
