@@ -574,7 +574,6 @@ def batch_norm(layer, layer_in, layerId, idNext, nextLayer,):
 def bidirectional(layer, layer_in, layerId, net):
     if layer['params']['merge_mode'] == '':
         layer['params']['merge_mode'] = None
-    
     class_name = layer['connection']['output'][0].split('_')[0]
     class_name = class_name[0].upper() + class_name[1:]
     wrapped_layer = deserialize(
@@ -585,14 +584,14 @@ def bidirectional(layer, layer_in, layerId, net):
     )
     out = {
         layerId: Bidirectional(
-            layer=wrapper_layer,
+            layer=wrapped_layer,
             merge_mode=layer['params']['merge_mode']
         )(*layer_in)
     }
     return out
 
 
-def time_distributed(layer, layer_in, layerId, net):    
+def time_distributed(layer, layer_in, layerId, net):
     class_name = layer['connection']['output'][0].split('_')[0]
     class_name = class_name[0].upper() + class_name[1:]
     wrapped_layer = deserialize(
@@ -603,7 +602,7 @@ def time_distributed(layer, layer_in, layerId, net):
     )
     out = {
         layerId: TimeDistributed(
-            layer=wrapper_layer
+            layer=wrapped_layer
         )(*layer_in)
     }
     return out
