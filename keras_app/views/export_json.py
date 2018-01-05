@@ -143,8 +143,12 @@ def export_json(request):
                         return JsonResponse({'result': 'error', 'error': 'Cannot convert ' +
                                              net[layerId]['info']['type'] + ' to Keras'})
                 else:
-                    net_out.update(layer_map[net[layerId]['info']['type']](
-                        net[layerId], layer_in, layerId))
+                    if (net[layerId]['info']['type'] == 'TimeDistributed' or (net[layerId]['info']['type'] == 'Bidirectional')):
+                        net_out.update(layer_map[net[layerId]['info']['type']](
+                            net[layerId], layer_in, layerId, net))
+                    else:
+                        net_out.update(layer_map[net[layerId]['info']['type']](
+                            net[layerId], layer_in, layerId))
                 for outputId in net[layerId]['connection']['output']:
                     if outputId not in stack:
                         stack.append(outputId)
