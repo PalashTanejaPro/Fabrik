@@ -451,7 +451,7 @@ class Content extends React.Component {
     // in order to avoid overlapping layers
     let map = {}
     // Layers which are not used alone
-    let combined_layers = ['ReLU', 'LRN', 'TanH', 'BatchNorm', 'Dropout', 'Scale'];
+    let combined_layers = ['ReLU', 'LRN', 'TanH', 'BatchNorm', 'Dropout', 'Scale', 'Bidirectional', 'TimeDistributed'];
     Object.keys(positions).forEach(layerId => {
       const layer = net[layerId];
       // Checking if the layer is one of the combined ones
@@ -513,7 +513,7 @@ class Content extends React.Component {
           top: `${top}px`,
           left: `${left}px`,
           class: ''
-      };
+      };  
       // keeping a map of layer's top,left coordinates.
       if(!map.hasOwnProperty(top)) {
         map[top]=[];
@@ -859,6 +859,7 @@ class Content extends React.Component {
                   <div className="loader"></div>
                 </div>);
     }
+    console.log(this.state.net); //eslint-disable-line no-console
     return (
         <div id="parent">
         <a className="sidebar-button" onClick={this.toggleSidebar}></a>

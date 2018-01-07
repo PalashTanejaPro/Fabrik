@@ -8,8 +8,9 @@ from layers_import import Input, Convolution, Deconvolution, Pooling, Dense, Dro
     Recurrent, BatchNorm, Activation, LeakyReLU, PReLU, ELU, Scale, Flatten, Reshape, Concat, \
     Eltwise, Padding, Upsample, LocallyConnected, ThresholdedReLU, Permute, RepeatVector,\
     ActivityRegularization, Masking, GaussianNoise, GaussianDropout, AlphaDropout, \
-    TimeDistributed, Bidirectional
+    TimeDistributed, Bidirectional, jsonLayer
 from keras.models import model_from_json, Sequential
+from keras.layers import deserialize
 
 
 @csrf_exempt
@@ -110,8 +111,17 @@ def import_json(request):
         name = ''
         class_name = layer.__class__.__name__
         if (class_name in layer_map):
+            # This is to handle wrappers and the wrapped layers.
+            if class_name in ['Bidirectional', 'TimeDistributed']:
+                net[layer.name] = layer_map[class_name](layer)
+                wrapped_layer = layer.get_config()['layer']
+                wrapped_layer['config']['inbound_nodes'] = [[[layer.name]]]                
+                net[wrapped_layer['config']['name']] = \
+                    jsonLayer(wrapped_layer['class_name'], wrapped_layer['config'], wrapped_layer['config'])
+                net[layer.name]['inbound_nodes'] = [wrapped_layer['config']['name']]
+                net[wrapped_layer['config']['name']]['connection']['output'] = [model.layers[idx+1].name]
             # This extra logic is to handle connections if the layer has an Activation
-            if (class_name in hasActivation and layer.activation.func_name != 'linear'):
+            elif (class_name in hasActivation and layer.activation.func_name != 'linear'):
                 net[layer.name+class_name] = layer_map[class_name](layer)
                 net[layer.name] = layer_map[layer.activation.func_name](layer)
                 net[layer.name+class_name]['connection']['output'].append(layer.name)
@@ -131,6 +141,8 @@ def import_json(request):
                     net[node.name]['connection']['output'].append(name)
         else:
             raise Exception('Cannot import layer of '+layer.__class__.__name__+' type')
+    for i in net.keys():
+        print(i, net[i]['connection']['input'], net[i]['connection']['output'])    
     # collect names of all zeroPad layers
     zeroPad = []
     # Transfer parameters and connections from zero pad
