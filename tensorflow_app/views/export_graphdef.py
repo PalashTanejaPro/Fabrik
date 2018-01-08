@@ -1,4 +1,3 @@
-import json
 import os
 import random
 import string
@@ -23,19 +22,21 @@ BASE_DIR = os.path.dirname(
 def randomword(length):
     return ''.join(random.choice(string.lowercase) for i in range(length))
 
+
 def json2pbtxt(json_string, f, output_fld):
     net_model = model_from_json(json_string)
     num_output = 1
-    pred = [None]*num_output
-    pred_node_names = [None]*num_output
+    pred = [None] * num_output
+    pred_node_names = [None] * num_output
     for i in range(num_output):
-        pred_node_names[i] = 'output_node'+str(i)
+        pred_node_names[i] = 'output_node' + str(i)
         pred[i] = tf.identity(net_model.outputs[i], name=pred_node_names[i])
     print('output nodes names are: ', pred_node_names)
 
     sess = K.get_session()
 
-    tf.train.write_graph(sess.graph.as_graph_def(), output_fld, f+'.pbtxt', as_text=True)
+    tf.train.write_graph(sess.graph.as_graph_def(),
+                         output_fld, f + '.pbtxt', as_text=True)
     print('saved the graph definition at: ', os.path.join(output_fld, f))
 
 
@@ -161,7 +162,8 @@ def export_to_tensorflow(request):
                     type = net[net[layerId]['connection']
                                ['input'][0]]['info']['type']
                     if (type != 'BatchNorm'):
-                        error.append(layerId + '(' + net[layerId]['info']['type'] + ')')
+                        error.append(
+                            layerId + '(' + net[layerId]['info']['type'] + ')')
                 else:
                     net_out.update(layer_map[net[layerId]['info']['type']](
                         net[layerId], layer_in, layerId))
@@ -170,7 +172,8 @@ def export_to_tensorflow(request):
                         stack.append(outputId)
                 processedLayer[layerId] = True
             else:
-                error.append(layerId + '(' + net[layerId]['info']['type'] + ')')
+                error.append(
+                    layerId + '(' + net[layerId]['info']['type'] + ')')
         if len(error):
             return JsonResponse(
                 {'result': 'error', 'error': 'Cannot convert ' + ', '.join(error) + ' to Keras'})
@@ -186,7 +189,7 @@ def export_to_tensorflow(request):
         model = Model(inputs=final_input, outputs=final_output, name=net_name)
         json_string = Model.to_json(model)
         randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
-        json2pbtxt(json_string, randomId, BASE_DIR+'/media/')
+        json2pbtxt(json_string, randomId, BASE_DIR + '/media/')
         return JsonResponse({'result': 'success',
                              'id': randomId,
                              'name': randomId + '.pbtxt',
