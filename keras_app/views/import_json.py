@@ -107,18 +107,32 @@ def import_json(request):
         if (model.layers[0].__class__.__name__ == 'Embedding'):
             input_layer.batch_input_shape = (None, model.layers[0].input_dim)
         net[input_layer.name] = Input(input_layer)
+        net[input_layer.name]['connection']['output'] = [model.layers[0].name]
     for idx, layer in enumerate(model.layers):
         name = ''
         class_name = layer.__class__.__name__
+        wrapped = False
         if (class_name in layer_map):
             # This is to handle wrappers and the wrapped layers.
             if class_name in ['Bidirectional', 'TimeDistributed']:
                 net[layer.name] = layer_map[class_name](layer)
                 wrapped_layer = layer.get_config()['layer']
-                wrapped_layer['config']['inbound_nodes'] = [[[layer.name]]]                
-                wrapped_layer = jsonLayer(wrapped_layer['class_name'], wrapped_layer['config'], wrapped_layer['config'])
-                net[layer.name]['wrapped_layer'] = wrapped_layer
-                name = layer.name
+                name = wrapped_layer['config']['name']
+                new_layer = deserialize({
+                    'class_name': wrapped_layer['class_name'],
+                    'config': wrapped_layer['config']
+                })
+                new_layer.wrapped = True
+                new_layer.wrapper = [layer.name]
+                net[name] = layer_map[wrapped_layer['class_name']](new_layer)
+                if len(model.layers) >= idx+2:
+                    net[name]['connection']['output'] = [model.layers[idx+1].name]
+                    model.layers[idx+1].inbound_nodes[0].inbound_layers = [new_layer]
+                else:
+                    net[name]['connection']['output'] = []
+                net[name]['connection']['input'] = [layer.name]
+                net[layer.name]['connection']['output'] = [name]
+                wrapped = True
             # This extra logic is to handle connections if the layer has an Activation
             elif (class_name in hasActivation and layer.activation.func_name != 'linear'):
                 net[layer.name+class_name] = layer_map[class_name](layer)
@@ -135,11 +149,12 @@ def import_json(request):
             else:
                 net[layer.name] = layer_map[class_name](layer)
                 name = layer.name
-            if (layer.inbound_nodes[0].inbound_layers):
+            if (layer.inbound_nodes[0].inbound_layers) and not wrapped:
                 for node in layer.inbound_nodes[0].inbound_layers:
                     net[node.name]['connection']['output'].append(name)
         else:
             raise Exception('Cannot import layer of '+layer.__class__.__name__+' type')
+        print(layer.name, net[layer.name]['connection'])            
     # collect names of all zeroPad layers
     zeroPad = []
     # Transfer parameters and connections from zero pad

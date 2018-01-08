@@ -507,12 +507,16 @@ def get_padding(params, input_shape, output_shape, pad_type, type):
 
 def jsonLayer(type, params, layer):
     input = []
-    if isinstance(layer, dict):
-        for node in layer['inbound_nodes'][0]:
-            input.append(node[0])
-    elif (len(layer.inbound_nodes[0].inbound_layers)):
-        for node in layer.inbound_nodes[0].inbound_layers:
-            input.append(node.name)
+    if hasattr(layer, 'wrapped'):
+        input.append(layer.wrapper[0])
+    else:
+        print(layer)
+        if isinstance(layer, dict):
+            for node in layer['inbound_nodes'][0]:
+                input.append(node[0])
+        elif (len(layer.inbound_nodes[0].inbound_layers)):
+            for node in layer.inbound_nodes[0].inbound_layers:
+                input.append(node.name)
     layer = {
                 'info': {
                     'type': type,
