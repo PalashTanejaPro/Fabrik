@@ -441,17 +441,17 @@ class Content extends React.Component {
         layer.props = {};
         // default name
         layer.props.name = layerId;
-      } else {
+      } 
+      else {
         tempError[type] = null;
       }
     });
-    // initialize the position of layers
-    let positions = netLayout(net);
+    let positions = netLayout(net);    
     // use map for maintaining top,left coordinates of layers
     // in order to avoid overlapping layers
     let map = {}
     // Layers which are not used alone
-    let combined_layers = ['ReLU', 'LRN', 'TanH', 'BatchNorm', 'Dropout', 'Scale', 'Bidirectional', 'TimeDistributed'];
+    let combined_layers = ['ReLU', 'LRN', 'TanH', 'BatchNorm', 'Dropout', 'Scale'];
     Object.keys(positions).forEach(layerId => {
       const layer = net[layerId];
       // Checking if the layer is one of the combined ones
@@ -514,11 +514,31 @@ class Content extends React.Component {
           left: `${left}px`,
           class: ''
       };  
+      if (layer.hasOwnProperty('wrapped_layer')) {
+        var wrapped_name = layer.wrapped_layer.params.name;
+        net[wrapped_name] = {}
+        net[wrapped_name].connection = {
+          input: [layerId], 
+          output: [layer.connection.output]
+        }
+        net[layerId].connection.output = [wrapped_name]                 
+        net[wrapped_name].info = layer.wrapped_layer.info;
+        net[wrapped_name].info.class = '';
+        net[wrapped_name].params = layer.wrapped_layer.params;
+        net[wrapped_name].props = {name: wrapped_name};
+        net[wrapped_name].state = {
+            top: `${top+50}px`,
+            left: `${left}px`,
+            class: ''
+        };
+        } 
       // keeping a map of layer's top,left coordinates.
       if(!map.hasOwnProperty(top)) {
-        map[top]=[];
+        map[top+50]=[];
       }
-      map[top].push(left);
+      map[top+50].push(left);
+
+
     });
 
     if (Object.keys(tempError).length) {
@@ -859,7 +879,6 @@ class Content extends React.Component {
                   <div className="loader"></div>
                 </div>);
     }
-    console.log(this.state.net); //eslint-disable-line no-console
     return (
         <div id="parent">
         <a className="sidebar-button" onClick={this.toggleSidebar}></a>

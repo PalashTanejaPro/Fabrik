@@ -116,10 +116,9 @@ def import_json(request):
                 net[layer.name] = layer_map[class_name](layer)
                 wrapped_layer = layer.get_config()['layer']
                 wrapped_layer['config']['inbound_nodes'] = [[[layer.name]]]                
-                net[wrapped_layer['config']['name']] = \
-                    jsonLayer(wrapped_layer['class_name'], wrapped_layer['config'], wrapped_layer['config'])
-                net[layer.name]['inbound_nodes'] = [wrapped_layer['config']['name']]
-                net[wrapped_layer['config']['name']]['connection']['output'] = [model.layers[idx+1].name]
+                wrapped_layer = jsonLayer(wrapped_layer['class_name'], wrapped_layer['config'], wrapped_layer['config'])
+                net[layer.name]['wrapped_layer'] = wrapped_layer
+                name = layer.name
             # This extra logic is to handle connections if the layer has an Activation
             elif (class_name in hasActivation and layer.activation.func_name != 'linear'):
                 net[layer.name+class_name] = layer_map[class_name](layer)
@@ -141,8 +140,6 @@ def import_json(request):
                     net[node.name]['connection']['output'].append(name)
         else:
             raise Exception('Cannot import layer of '+layer.__class__.__name__+' type')
-    for i in net.keys():
-        print(i, net[i]['connection']['input'], net[i]['connection']['output'])    
     # collect names of all zeroPad layers
     zeroPad = []
     # Transfer parameters and connections from zero pad
