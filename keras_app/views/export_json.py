@@ -168,13 +168,14 @@ def export_json(request, is_tf=False):
         model = Model(inputs=final_input, outputs=final_output, name=net_name)
         json_string = Model.to_json(model)
 
-        if not is_tf:
-            randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
-            with open(BASE_DIR + '/media/' + randomId + '.json', 'w') as f:
-                json.dump(json.loads(json_string), f, indent=4)
+        
+        randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
+        with open(BASE_DIR + '/media/' + randomId + '.json', 'w') as f:
+            json.dump(json.loads(json_string), f, indent=4)
+        if not is_tf:    
             return JsonResponse({'result': 'success',
                                  'id': randomId,
                                  'name': randomId + '.json',
                                  'url': '/media/' + randomId + '.json'})
         else:
-            return json_string
+            return randomId
