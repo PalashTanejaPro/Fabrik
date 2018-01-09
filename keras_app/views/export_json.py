@@ -21,8 +21,7 @@ def randomword(length):
     return ''.join(random.choice(string.lowercase) for i in range(length))
 
 
-@csrf_exempt
-def export_json(request):
+def export_json_util(request):
     if request.method == 'POST':
         net = yaml.safe_load(request.POST.get('net'))
         net_name = request.POST.get('net_name')
@@ -167,10 +166,15 @@ def export_json(request):
 
         model = Model(inputs=final_input, outputs=final_output, name=net_name)
         json_string = Model.to_json(model)
-        randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
-        with open(BASE_DIR + '/media/' + randomId + '.json', 'w') as f:
-            json.dump(json.loads(json_string), f, indent=4)
-        return JsonResponse({'result': 'success',
-                             'id': randomId,
-                             'name': randomId + '.json',
-                             'url': '/media/' + randomId + '.json'})
+        return json_string
+
+@csrf_exempt
+def export_json(request):
+    json_string = export_json_util(request)
+    randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
+    with open(BASE_DIR + '/media/' + randomId + '.json', 'w') as f:
+        json.dump(json.loads(json_string), f, indent=4)
+    return JsonResponse({'result': 'success',
+                         'id': randomId,
+                         'name': randomId + '.json',
+                         'url': '/media/' + randomId + '.json'})
