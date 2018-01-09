@@ -510,7 +510,6 @@ def jsonLayer(type, params, layer):
     if hasattr(layer, 'wrapped'):
         input.append(layer.wrapper[0])
     else:
-        print(layer)
         if isinstance(layer, dict):
             for node in layer['inbound_nodes'][0]:
                 input.append(node[0])

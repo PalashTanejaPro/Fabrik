@@ -154,7 +154,6 @@ def import_json(request):
                     net[node.name]['connection']['output'].append(name)
         else:
             raise Exception('Cannot import layer of '+layer.__class__.__name__+' type')
-        print(layer.name, net[layer.name]['connection'])            
     # collect names of all zeroPad layers
     zeroPad = []
     # Transfer parameters and connections from zero pad

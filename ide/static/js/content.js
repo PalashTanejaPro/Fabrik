@@ -388,7 +388,8 @@ class Content extends React.Component {
       success: function (response) {
         if (response.result === 'success'){
           this.initialiseImportedNet(response.net,response.net_name);
-          this.loadLayerShapes();
+          if (Object.keys(this.state.net).length)
+            this.loadLayerShapes();
         } else if (response.result === 'error'){
           this.addError(response.error);
         }
@@ -404,7 +405,6 @@ class Content extends React.Component {
     // this line will unmount all the layers
     // so that the new imported layers will all be mounted again
     const tempError = {};
-    const error = [];
     // maintaining height & width in integers for use of map in order to
     // reduce the search space for overlapping layers & plotting.
     const height = Math.round(0.05*window.innerHeight, 0);
@@ -441,12 +441,12 @@ class Content extends React.Component {
         layer.props = {};
         // default name
         layer.props.name = layerId;
-      } 
-      else {
+      } else {
         tempError[type] = null;
       }
     });
-    let positions = netLayout(net);    
+    // initialize the position of layers
+    let positions = tempError.length ? {} : netLayout(net);
     // use map for maintaining top,left coordinates of layers
     // in order to avoid overlapping layers
     let map = {}
@@ -513,39 +513,17 @@ class Content extends React.Component {
           top: `${top}px`,
           left: `${left}px`,
           class: ''
-      };  
-      if (layer.hasOwnProperty('wrapped_layer')) {
-        var wrapped_name = layer.wrapped_layer.params.name;
-        net[wrapped_name] = {}
-        net[wrapped_name].connection = {
-          input: [layerId], 
-          output: [layer.connection.output]
-        }
-        net[layerId].connection.output = [wrapped_name]                 
-        net[wrapped_name].info = layer.wrapped_layer.info;
-        net[wrapped_name].info.class = '';
-        net[wrapped_name].params = layer.wrapped_layer.params;
-        net[wrapped_name].props = {name: wrapped_name};
-        net[wrapped_name].state = {
-            top: `${top+50}px`,
-            left: `${left}px`,
-            class: ''
-        };
-        } 
+      };
       // keeping a map of layer's top,left coordinates.
       if(!map.hasOwnProperty(top)) {
-        map[top+50]=[];
+        map[top]=[];
       }
-      map[top+50].push(left);
-
-
+      map[top].push(left);
     });
 
     if (Object.keys(tempError).length) {
-      Object.keys(tempError).forEach(type => {
-        error.push(`Error: Currently we do not support prototxt with "${type}" Layer.`);
-      });
-      this.setState({ error });
+      const errorLayers = Object.keys(tempError).join(', ');
+      this.setState({ error: [`Error: Currently we do not support these layers: ${errorLayers}.`] });
     } else {
       instance.detachEveryConnection();
       instance.deleteEveryEndpoint();
@@ -965,4 +943,3 @@ class Content extends React.Component {
 }
 
 export default Content;
-
