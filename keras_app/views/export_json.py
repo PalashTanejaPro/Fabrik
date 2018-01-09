@@ -143,7 +143,8 @@ def export_json(request, is_tf=False):
                     type = net[net[layerId]['connection']
                                ['input'][0]]['info']['type']
                     if (type != 'BatchNorm'):
-                        error.append(layerId + '(' + net[layerId]['info']['type'] + ')')
+                        error.append(
+                            layerId + '(' + net[layerId]['info']['type'] + ')')
                 else:
                     net_out.update(layer_map[net[layerId]['info']['type']](
                         net[layerId], layer_in, layerId))
@@ -152,7 +153,8 @@ def export_json(request, is_tf=False):
                         stack.append(outputId)
                 processedLayer[layerId] = True
             else:
-                error.append(layerId + '(' + net[layerId]['info']['type'] + ')')
+                error.append(
+                    layerId + '(' + net[layerId]['info']['type'] + ')')
         if len(error):
             return JsonResponse(
                 {'result': 'error', 'error': 'Cannot convert ' + ', '.join(error) + ' to Keras'})
@@ -168,11 +170,10 @@ def export_json(request, is_tf=False):
         model = Model(inputs=final_input, outputs=final_output, name=net_name)
         json_string = Model.to_json(model)
 
-        
         randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
         with open(BASE_DIR + '/media/' + randomId + '.json', 'w') as f:
             json.dump(json.loads(json_string), f, indent=4)
-        if not is_tf:    
+        if not is_tf:
             return JsonResponse({'result': 'success',
                                  'id': randomId,
                                  'name': randomId + '.json',
