@@ -22,11 +22,12 @@ BASE_DIR = os.path.dirname(
 
 output_fld = BASE_DIR + '/media/'
 
-with open(output_fld+input_file, 'r') as f:
+with open(output_fld + input_file, 'r') as f:
     json_str = f.read()
 
 json_str = json_str.strip("'<>() ").replace('\'', '\"')
 model = model_from_json(json_str)
 
 sess = K.get_session()
-tf.train.write_graph(sess.graph.as_graph_def(), output_fld, output_file+'.pbtxt', as_text=True)
+tf.train.write_graph(sess.graph.as_graph_def(), output_fld,
+                     output_file + '.pbtxt', as_text=True)

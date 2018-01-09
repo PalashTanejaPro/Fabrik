@@ -12,12 +12,14 @@ BASE_DIR = os.path.dirname(
 def randomword(length):
     return ''.join(random.choice(string.lowercase) for i in range(length))
 
+
 @csrf_exempt
 def export_to_tensorflow(request):
     response = export_json(request, is_tf=True)
     randomId = response
     os.chdir(BASE_DIR + '/tensorflow_app/views/')
-    os.system('KERAS_BACKEND=tensorflow python json2pbtxt.py -input_file '+randomId+'.json -output_file '+randomId)
+    os.system('KERAS_BACKEND=tensorflow python json2pbtxt.py -input_file ' +
+              randomId + '.json -output_file ' + randomId)
     return JsonResponse({'result': 'success',
                          'id': randomId,
                          'name': randomId + '.pbtxt',
