@@ -1,7 +1,6 @@
 import os
 import random
 import string
-import yaml
 
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
@@ -10,9 +9,6 @@ from keras.models import Model
 from keras.models import model_from_json
 import tensorflow as tf
 from keras import backend as K
-from keras_app.views.layers_export import data, convolution, deconvolution, pooling, dense, dropout, embed,\
-    recurrent, batch_norm, activation, flatten, reshape, eltwise, concat, upsample, locally_connected,\
-    permute, repeat_vector, regularization, masking, gaussian_noise, gaussian_dropout, alpha_dropout
 from keras_app.views.export_json import export_json_util
 
 BASE_DIR = os.path.dirname(

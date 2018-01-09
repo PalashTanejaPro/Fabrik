@@ -176,7 +176,7 @@ def export_json(request):
     json_string = export_json_util(request)
     randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
     with open(BASE_DIR + '/media/' + randomId + '.json', 'w') as f:
-        json.dump(json.loads(json_string), f, indent=4)
+        json.dump(json_string, f, indent=4)
     return JsonResponse({'result': 'success',
                          'id': randomId,
                          'name': randomId + '.json',
