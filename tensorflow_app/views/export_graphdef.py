@@ -35,10 +35,10 @@ def json2pbtxt(json_string, f, output_fld):
 
 @csrf_exempt
 def export_to_tensorflow(request):
-        json_string = export_json_util(request)
-        randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
-        json2pbtxt(json_string, randomId, BASE_DIR + '/media/')
-        return JsonResponse({'result': 'success',
-                             'id': randomId,
-                             'name': randomId + '.pbtxt',
-                             'url': '/media/' + randomId + '.pbtxt'})
+    json_string = export_json_util(request)
+    randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
+    json2pbtxt(json_string, randomId, BASE_DIR + '/media/')
+    return JsonResponse({'result': 'success',
+                         'id': randomId,
+                         'name': randomId + '.pbtxt',
+                         'url': '/media/' + randomId + '.pbtxt'})

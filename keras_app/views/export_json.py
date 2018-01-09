@@ -142,7 +142,8 @@ def export_json_util(request):
                     type = net[net[layerId]['connection']
                                ['input'][0]]['info']['type']
                     if (type != 'BatchNorm'):
-                        error.append(layerId + '(' + net[layerId]['info']['type'] + ')')
+                        error.append(
+                            layerId + '(' + net[layerId]['info']['type'] + ')')
                 else:
                     net_out.update(layer_map[net[layerId]['info']['type']](
                         net[layerId], layer_in, layerId))
@@ -151,7 +152,8 @@ def export_json_util(request):
                         stack.append(outputId)
                 processedLayer[layerId] = True
             else:
-                error.append(layerId + '(' + net[layerId]['info']['type'] + ')')
+                error.append(
+                    layerId + '(' + net[layerId]['info']['type'] + ')')
         if len(error):
             return JsonResponse(
                 {'result': 'error', 'error': 'Cannot convert ' + ', '.join(error) + ' to Keras'})
@@ -167,6 +169,7 @@ def export_json_util(request):
         model = Model(inputs=final_input, outputs=final_output, name=net_name)
         json_string = Model.to_json(model)
         return json_string
+
 
 @csrf_exempt
 def export_json(request):
