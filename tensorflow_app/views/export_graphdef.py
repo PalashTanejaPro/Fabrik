@@ -9,7 +9,7 @@ from keras.models import Model
 from keras.models import model_from_json
 import tensorflow as tf
 from keras import backend as K
-from keras_app.views.export_json import export_json_util
+from keras_app.views.export_json import export_json
 
 BASE_DIR = os.path.dirname(
     os.path.dirname(
@@ -31,7 +31,7 @@ def json2pbtxt(json_string, f, output_fld):
 
 @csrf_exempt
 def export_to_tensorflow(request):
-    json_string = export_json_util(request)
+    json_string = export_json(request, is_tf=True)
     randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
     json2pbtxt(json_string, randomId, BASE_DIR + '/media/')
     return JsonResponse({'result': 'success',
