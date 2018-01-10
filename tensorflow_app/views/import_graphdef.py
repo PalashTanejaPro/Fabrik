@@ -249,7 +249,7 @@ def import_graph_def(request):
         for layer_name in batch_norms:
             scale_layer_name = layer_name + '_scale'
             temp_d_batch[scale_layer_name] = {'type': ['Scale'], 'input': [layer_name],
-                                             'output': d[layer_name]['output'], 'params': {}}
+                                              'output': d[layer_name]['output'], 'params': {}}
             for output_layer_name in d[layer_name]['output']:
                 for n, i in enumerate(d[output_layer_name]['input']):
                     if i == layer_name:
