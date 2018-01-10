@@ -247,14 +247,14 @@ def import_graph_def(request):
 
         temp_d_batch = {}
         for layer_name in batch_norms:
-            relu_layer_name = layer_name + '_scale'
-            temp_d_batch[relu_layer_name] = {'type': ['Scale'], 'input': [layer_name],
+            scale_layer_name = layer_name + '_scale'
+            temp_d_batch[scale_layer_name] = {'type': ['Scale'], 'input': [layer_name],
                                              'output': d[layer_name]['output'], 'params': {}}
             for output_layer_name in d[layer_name]['output']:
                 for n, i in enumerate(d[output_layer_name]['input']):
                     if i == layer_name:
-                        d[output_layer_name]['input'][n] = relu_layer_name
-            d[layer_name]['output'] = [relu_layer_name]
+                        d[output_layer_name]['input'][n] = scale_layer_name
+            d[layer_name]['output'] = [scale_layer_name]
         for key in temp_d_batch:
             d[key] = temp_d_batch[key]
 
