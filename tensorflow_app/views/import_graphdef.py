@@ -9,7 +9,7 @@ import math
 op_layer_map = {'Placeholder': 'Input', 'Conv2D': 'Convolution', 'MaxPool': 'Pooling',
                 'MatMul': 'InnerProduct', 'Relu': 'ReLU', 'Softmax': 'Softmax', 'LRN': 'LRN',
                 'Concat': 'Concat', 'AvgPool': 'Pooling', 'Reshape': 'Flatten'}
-name_map = {'flatten': 'Flatten', 'dropout': 'Dropout'}
+name_map = {'flatten': 'Flatten', 'dropout': 'Dropout', 'batch': 'BatchNorm', 'add': 'Eltwise', 'mul': 'Eltwise'}
 
 
 def get_layer_name(node_name):
@@ -32,7 +32,6 @@ def get_layer_type(node_name):
 
 def get_padding(node, layer):
     layer_name = get_layer_name(node.name)
-    print layer_name
     input_shape = None
     output_shape = None
     for input_tensor in node.inputs:
@@ -131,8 +130,6 @@ def import_graph_def(request):
                 continue
             name = get_layer_name(node.name)
             layer = d[name]
-            if len(layer['type']) == 0:
-                continue
             if layer['type'][0] == 'Input':
                 # NCHW to NWHC data format
                 layer['params']['dim'] = str(map(int, [node.get_attr('shape').dim[i].size
@@ -189,6 +186,20 @@ def import_graph_def(request):
                 if str(node.name) == name + '/weights' or str(node.name) == name + '/kernel':
                     layer['params']['num_output'] = int(node.get_attr('shape').dim[1].size)
 
+            elif layer['type'][0] == 'BatchNorm':
+                if str(node.name) == name + '/batchnorm_1/add/y':
+                    layer['params']['epsilon'] = node.get_attr('value').float_val[0]
+                if str(node.name) == name + '/AssignMovingAvg/decay':
+                    layer['params']['moving_average_fraction'] = node.get_attr('value').float_val[0]
+
+            elif layer['type'][0] == 'Eltwise':
+                if str(node.name).split('_')[0] == 'add':
+                    layer['params']['layer_type'] = 'Sum'
+                if str(node.name).split('_')[0] == 'mul':
+                    layer['params']['layer_type'] = 'Product'
+                if str(node.name).split('_')[0] == 'dot':
+                    layer['params']['layer_type'] = 'Dot'
+
             elif layer['type'][0] == 'ReLU':
                 pass
 
@@ -206,11 +217,8 @@ def import_graph_def(request):
 
             elif layer['type'][0] == 'Dropout':
                 pass
-
         net = {}
         for key in d:
-            if len(d[key]['type']) == 0:
-                continue
             net[key] = {
                     'info': {
                         'type': d[key]['type'][0],
