@@ -4,6 +4,7 @@ from tensorflow.core.framework import graph_pb2
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import math
+import re
 
 # map from operation name(tensorflow) to layer name(caffe)
 op_layer_map = {'Placeholder': 'Input', 'Conv2D': 'Convolution', 'MaxPool': 'Pooling',
@@ -202,9 +203,13 @@ def import_graph_def(request):
                         node.get_attr('shape').dim[1].size)
 
             elif layer['type'][0] == 'BatchNorm':
-                if str(node.name) == name + '/batchnorm_1/add/y':
-                    layer['params']['epsilon'] = node.get_attr(
-                        'value').float_val[0]
+                if re.match('.*\/batchnorm[_]?[0-9]?\/add.*', str(node.name)):
+                    try:
+                        layer['params']['epsilon'] = node.get_attr(
+                            'value').float_val[0]
+                    except:
+                        pass
+
                 if str(node.name) == name + '/AssignMovingAvg/decay':
                     layer['params']['moving_average_fraction'] = node.get_attr(
                         'value').float_val[0]
@@ -235,7 +240,25 @@ def import_graph_def(request):
             elif layer['type'][0] == 'Dropout':
                 pass
         net = {}
-        for key in d:
+        batch_norms = []
+        for key in d.keys():
+            if d[key]['type'][0] == 'BatchNorm' and len(d[key]['input']) > 0 and len(d[key]['output']) > 0:
+                batch_norms.append(key)
+
+        temp_d_batch = {}
+        for layer_name in batch_norms:
+            relu_layer_name = layer_name + '_scale'
+            temp_d_batch[relu_layer_name] = {'type': ['Scale'], 'input': [layer_name],
+                                             'output': d[layer_name]['output'], 'params': {}}
+            for output_layer_name in d[layer_name]['output']:
+                for n, i in enumerate(d[output_layer_name]['input']):
+                    if i == layer_name:
+                        d[output_layer_name]['input'][n] = relu_layer_name
+            d[layer_name]['output'] = [relu_layer_name]
+        for key in temp_d_batch:
+            d[key] = temp_d_batch[key]
+
+        for key in d.keys():
             net[key] = {
                 'info': {
                     'type': d[key]['type'][0],
