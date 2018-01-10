@@ -32,6 +32,7 @@ class Content extends React.Component {
     this.state = {
       net: {},
       net_name: 'Untitled',
+      draggingLayer: null,
       selectedLayer: null,
       hoveredLayer: null,
       nextLayerId: 0,
@@ -47,6 +48,7 @@ class Content extends React.Component {
     this.changeHoveredLayer = this.changeHoveredLayer.bind(this);
     this.componentWillMount = this.componentWillMount.bind(this);
     this.modifyLayer = this.modifyLayer.bind(this);
+    this.setDraggingLayer = this.setDraggingLayer.bind(this);
     this.changeNetName = this.changeNetName.bind(this);
     this.adjustParameters = this.adjustParameters.bind(this);
     this.modifyLayerParams = this.modifyLayerParams.bind(this);
@@ -540,6 +542,9 @@ class Content extends React.Component {
       });
     }
   }
+  setDraggingLayer(id) {
+    this.setState({ draggingLayer: id })
+  }
   changeNetName(event) {
     this.setState({net_name: event.target.value});
   }
@@ -864,7 +869,7 @@ class Content extends React.Component {
           <div id="logo_back">
             <a href="http://fabrik.cloudcv.org"><img src={'/static/img/fabrik_t.png'} className="img-responsive" alt="logo" id="logo"/></a>
           </div>
-          <div className="col-md-12">
+          <div id="sidebar-scroll" className="col-md-12">
              <h5 className="sidebar-heading">ACTIONS</h5>
              <TopBar
               exportNet={this.exportNet}
@@ -875,6 +880,7 @@ class Content extends React.Component {
              <h5 className="sidebar-heading">INSERT LAYER</h5>
              <Pane 
              handleClick = {this.handleClick}
+             setDraggingLayer = {this.setDraggingLayer}
              />
              <div className="text-center">
               <Tabs selectedPhase={this.state.selectedPhase} changeNetPhase={this.changeNetPhase} />
@@ -897,7 +903,6 @@ class Content extends React.Component {
           {loader}
           <Canvas
             net={this.state.net}
-            selectedPhase={this.state.selectedPhase}
             rebuildNet={this.state.rebuildNet}
             addNewLayer={this.addNewLayer}
             nextLayerId={this.state.nextLayerId}
@@ -910,6 +915,9 @@ class Content extends React.Component {
             addError={this.addError}
             clickEvent={this.clickEvent}
             totalParameters={this.state.totalParameters}
+            selectedPhase={this.state.selectedPhase}
+            draggingLayer={this.state.draggingLayer}
+            setDraggingLayer={this.setDraggingLayer}
           />
           <SetParams
             net={this.state.net}
