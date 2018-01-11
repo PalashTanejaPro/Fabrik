@@ -144,8 +144,8 @@ def export_json(request):
                                              net[layerId]['info']['type'] + ' to Keras'})
                 else:
                     if (net[layerId]['info']['type'] in ['TimeDistributed', 'Bidirectional']):
-                        net_out.update(layer_map[net[layerId]['info']['type']](
-                            net[layerId], layer_in, layerId, net))
+                        idNext = net[layerId]['connection']['output'][0]
+                        net_out.update(layer_map[net[layerId]['info']['type']](layerId, idNext, net, layer_in, layer_map))
                     else:
                         net_out.update(layer_map[net[layerId]['info']['type']](
                             net[layerId], layer_in, layerId))
@@ -164,7 +164,7 @@ def export_json(request):
 
         for j in outputLayerId:
             final_output.append(net_out[j])
-
+    
         model = Model(inputs=final_input, outputs=final_output, name=net_name)
         json_string = Model.to_json(model)
         randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)

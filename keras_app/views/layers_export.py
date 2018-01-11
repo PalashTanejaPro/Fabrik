@@ -525,7 +525,7 @@ def alpha_dropout(layer, layer_in, layerId):
 
 
 # ********** Normalisation Layers **********
-def batch_norm(layer, layer_in, layerId, idNext, nextLayer,):
+def batch_norm(layer, layer_in, layerId, idNext, nextLayer):
     out = {}
     momentum = layer['params']['moving_average_fraction']
     eps = float(layer['params']['eps'])
@@ -571,40 +571,21 @@ def batch_norm(layer, layer_in, layerId, idNext, nextLayer,):
     return out
 
 
-def bidirectional(layer, layer_in, layerId, net):
-    if layer['params']['merge_mode'] == '':
-        layer['params']['merge_mode'] = None
-    class_name = layer['connection']['output'][0].split('_')[0]
-    class_name = class_name[0].upper() + class_name[1:]
-    wrapped_layer = deserialize(
-        {
-            'class_name': class_name,
-            'config': net[layer['connection']['output'][0]]
-        }
-    )
-    out = {
-        layerId: Bidirectional(
-            layer=wrapped_layer,
-            merge_mode=layer['params']['merge_mode']
-        )(*layer_in)
-    }
+def bidirectional(layerId, idNext, net, layer_in, layer_map):
+    if net[layerId]['params']['merge_mode'] == '':
+        net[layerId]['params']['merge_mode'] = None
+    mode = net[layerId]['params']['merge_mode']
+    out[layerId] = Bidirectional(
+        layer_map[net[idNext]['info']['type']](net[idNext], layer_in, idNext),
+        mode)
     return out
 
 
-def time_distributed(layer, layer_in, layerId, net):
-    class_name = layer['connection']['output'][0].split('_')[0]
-    class_name = class_name[0].upper() + class_name[1:]
-    wrapped_layer = deserialize(
-        {
-            'class_name': class_name,
-            'config': net[layer['connection']['output'][0]]
-        }
-    )
-    out = {
-        layerId: TimeDistributed(
-            layer=wrapped_layer
-        )(*layer_in)
-    }
+def time_distributed(layerId, idNext, net, layer_in, layer_map):
+    mode = net[layerId]['params']['merge_mode']
+    out[layerId] = TimeDistributed(
+        layer_map[net[idNext]['info']['type']](net[idNext], layer_in, idNext),
+        mode)
     return out
 
 
