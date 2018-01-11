@@ -8,7 +8,7 @@ from layers_import import Input, Convolution, Deconvolution, Pooling, Dense, Dro
     Recurrent, BatchNorm, Activation, LeakyReLU, PReLU, ELU, Scale, Flatten, Reshape, Concat, \
     Eltwise, Padding, Upsample, LocallyConnected, ThresholdedReLU, Permute, RepeatVector,\
     ActivityRegularization, Masking, GaussianNoise, GaussianDropout, AlphaDropout, \
-    TimeDistributed, Bidirectional, jsonLayer
+    TimeDistributed, Bidirectional
 from keras.models import model_from_json, Sequential
 from keras.layers import deserialize
 
@@ -124,14 +124,21 @@ def import_json(request):
                 })
                 new_layer.wrapped = True
                 new_layer.wrapper = [layer.name]
-                net[name] = layer_map[wrapped_layer['class_name']](new_layer)
+                if new_layer.activation.func_name != 'linear':
+                    net[name+wrapped_layer['class_name']] = layer_map[wrapped_layer['class_name']](new_layer)
+                    net[name] = layer_map[new_layer.activation.func_name](new_layer)
+                    net[name+wrapped_layer['class_name']]['connection']['output'].append(name)
+                    net[name]['connection']['input'] = [name+wrapped_layer['class_name']]
+                    net[layer.name]['connection']['output'] = [name+wrapped_layer['class_name']]
+                else:
+                    net[name] = layer_map[wrapped_layer['class_name']](new_layer)
+                    net[name]['connection']['input'] = [layer.name]
+                    net[layer.name]['connection']['output'] = [name]
                 if len(model.layers) >= idx+2:
                     net[name]['connection']['output'] = [model.layers[idx+1].name]
                     model.layers[idx+1].inbound_nodes[0].inbound_layers = [new_layer]
                 else:
                     net[name]['connection']['output'] = []
-                net[name]['connection']['input'] = [layer.name]
-                net[layer.name]['connection']['output'] = [name]
                 wrapped = True
             # This extra logic is to handle connections if the layer has an Activation
             elif (class_name in hasActivation and layer.activation.func_name != 'linear'):

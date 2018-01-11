@@ -122,7 +122,6 @@ def export_json(request):
                 i = len(stack) - 1
                 while isProcessPossible(stack[i]) is False:
                     i = i - 1
-
                 layerId = stack[i]
                 stack.remove(layerId)
                 if (net[layerId]['info']['type'] != 'Scale'):
@@ -142,10 +141,16 @@ def export_json(request):
                     if (type != 'BatchNorm'):
                         return JsonResponse({'result': 'error', 'error': 'Cannot convert ' +
                                              net[layerId]['info']['type'] + ' to Keras'})
+                elif (net[layerId]['info']['type'] in ['TimeDistributed', 'Bidirectional']):
+                    idNext = net[layerId]['connection']['output'][0]
+                    net_out.update(
+                        layer_map[net[layerId]['info']['type']](layerId, idNext, net, layer_in, layer_map))
+                    net[net[idNext]['connection']['output'][0]]['connection']['input'] = [layerId]
+                    processedLayer[layerId] = True
+                    processedLayer[idNext] = True
                 else:
-                    if (net[layerId]['info']['type'] in ['TimeDistributed', 'Bidirectional']):
-                        idNext = net[layerId]['connection']['output'][0]
-                        net_out.update(layer_map[net[layerId]['info']['type']](layerId, idNext, net, layer_in, layer_map))
+                    if net[layerId]['connection']['input'] and net[layerId]['connection']['input'][0] in ['TimeDistributed', 'Bidirectional']:
+                        pass
                     else:
                         net_out.update(layer_map[net[layerId]['info']['type']](
                             net[layerId], layer_in, layerId))
@@ -164,7 +169,7 @@ def export_json(request):
 
         for j in outputLayerId:
             final_output.append(net_out[j])
-    
+
         model = Model(inputs=final_input, outputs=final_output, name=net_name)
         json_string = Model.to_json(model)
         randomId = datetime.now().strftime('%Y%m%d%H%M%S') + randomword(5)
