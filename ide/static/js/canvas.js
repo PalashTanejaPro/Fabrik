@@ -20,6 +20,7 @@ class Canvas extends React.Component {
     this.hover = 0;
     this.mouseState = null;
     this.placeholder = true;
+    this.disableZoom = true;
   }
   /* this function returns the layers between a specified output y and input y
   it also sneaks in another functionallity of determining which direction is most crowded. this is specifically 
@@ -119,6 +120,13 @@ class Canvas extends React.Component {
     instance.bind('connectionDetached', this.detachConnectionEvent.bind(this));
     this.mouseState = panZoom();
   }
+  componentWillUpdate() {
+    this.placeholder = false;
+    const net = this.props.net;
+    if (Object.keys(net).length > 0) { //enable zoom buttons if there are layers 
+      this.disableZoom = false;
+    }
+  }
   componentDidUpdate() {
     this.placeholder = false;
     instance.draggable(jsPlumb.getSelector('.layer'),
@@ -127,9 +135,9 @@ class Canvas extends React.Component {
         grid: [8, 8]
       }
     );
-    const net = this.props.net;    
+    const net = this.props.net;
     if (this.props.rebuildNet) {
-      let combined_layers = ['ReLU', 'LRN', 'TanH', 'BatchNorm', 'Dropout', 'Scale'];
+      let combined_layers = ['ReLU', 'PReLU', 'LRN', 'TanH', 'BatchNorm', 'Dropout', 'Scale'];
       this.checkCutting(net);
       Object.keys(net).forEach(inputId => {
         const layer = net[inputId];
@@ -194,7 +202,7 @@ class Canvas extends React.Component {
         instance.connect({
           source: s,
           target: t});
-      }
+      } 
     }
   }
   allowDrop(event) {
@@ -223,6 +231,8 @@ class Canvas extends React.Component {
     this.placeholder = false;
     event.preventDefault();
     if (event.target.id === 'panZoomContainer' && !this.mouseState.pan) {
+      if (this.props.selectedLayer!=null) 
+        this.props.modifyLayer(this.props.net[this.props.selectedLayer], this.props.selectedLayer);
       this.props.changeSelectedLayer(null);
     }
     this.mouseState.pan = false;
@@ -423,13 +433,13 @@ class Canvas extends React.Component {
       </div>
       <div id='icon-plus' className="canvas-icon">
         <p>Press ]</p>
-        <button className="btn btn-default text-center">
+        <button className="btn btn-default text-center" id='btn-plus' disabled={this.disableZoom}>
             <span className="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>
         </button>
       </div>
       <div id='icon-minus' className="canvas-icon">
         <p>Press [</p>
-        <button className="btn btn-default text-center">
+          <button className="btn btn-default text-center" id='btn-minus' disabled={this.disableZoom}>
             <span className="glyphicon glyphicon glyphicon-minus" aria-hidden="true"></span>
         </button>
       </div>
@@ -455,7 +465,8 @@ Canvas.propTypes = {
   clickEvent: React.PropTypes.bool,
   totalParameters: React.PropTypes.number,
   setDraggingLayer: React.PropTypes.func,
-  draggingLayer: React.PropTypes.string
+  draggingLayer: React.PropTypes.string,
+  selectedLayer: React.PropTypes.string
 };
 
 export default Canvas;
