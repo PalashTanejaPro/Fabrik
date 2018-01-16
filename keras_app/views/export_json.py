@@ -10,7 +10,8 @@ from django.http import JsonResponse
 from keras.models import Model
 from layers_export import data, convolution, deconvolution, pooling, dense, dropout, embed,\
     recurrent, batch_norm, activation, flatten, reshape, eltwise, concat, upsample, locally_connected,\
-    permute, repeat_vector, regularization, masking, gaussian_noise, gaussian_dropout, alpha_dropout
+    permute, repeat_vector, regularization, masking, gaussian_noise, gaussian_dropout, alpha_dropout, \
+    bidirectional, time_distributed
 BASE_DIR = os.path.dirname(
     os.path.dirname(
         os.path.dirname(
@@ -70,7 +71,9 @@ def export_json(request, is_tf=False):
             'GaussianNoise': gaussian_noise,
             'GaussianDropout': gaussian_dropout,
             'AlphaDropout': alpha_dropout,
-            'Scale': ''
+            'Scale': '',
+            'TimeDistributed': time_distributed,
+            'Bidirectional': bidirectional
         }
 
         # Check if conversion is possible
@@ -125,7 +128,6 @@ def export_json(request, is_tf=False):
                 i = len(stack) - 1
                 while isProcessPossible(stack[i]) is False:
                     i = i - 1
-
                 layerId = stack[i]
                 stack.remove(layerId)
                 if (net[layerId]['info']['type'] != 'Scale'):
@@ -143,14 +145,21 @@ def export_json(request, is_tf=False):
                     type = net[net[layerId]['connection']
                                ['input'][0]]['info']['type']
                     if (type != 'BatchNorm'):
-                        error.append(
-                            layerId + '(' + net[layerId]['info']['type'] + ')')
+                        return JsonResponse({'result': 'error', 'error': 'Cannot convert ' +
+                                             net[layerId]['info']['type'] + ' to Keras'})
+                elif (net[layerId]['info']['type'] in ['TimeDistributed', 'Bidirectional']):
+                    idNext = net[layerId]['connection']['output'][0]
+                    net_out.update(
+                        layer_map[net[layerId]['info']['type']](layerId, idNext, net, layer_in, layer_map))
+                    net[net[idNext]['connection']['output'][0]]['connection']['input'] = [layerId]
+                    processedLayer[layerId] = True
+                    processedLayer[idNext] = True
                 else:
-                    try:
+                    if net[layerId]['connection']['input'] and net[layerId]['connection']['input'][0] in ['TimeDistributed', 'Bidirectional']:
+                        pass
+                    else:
                         net_out.update(layer_map[net[layerId]['info']['type']](
                             net[layerId], layer_in, layerId))
-                    except Exception:
-                        return JsonResponse({'result': 'error', 'error': traceback.format_exc()})
                 for outputId in net[layerId]['connection']['output']:
                     if outputId not in stack:
                         stack.append(outputId)
