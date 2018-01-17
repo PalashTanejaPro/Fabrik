@@ -92,7 +92,7 @@ def export_json(request, is_tf=False):
             elif net[layerId]['info']['type'] == 'Input' and net[net[layerId]['connection']['output'][0]]['info']['type'] in ['TimeDistributed', 'Bidirectional']:
                 connected_layer = net[layerId]['connection']['output'][0]
                 net[connected_layer]['params']['batch_input_shape'] = net[layerId]['params']['dim']
-
+                print net[connected_layer]['params']['batch_input_shape']
         for i in redundant_layers:
             del net[i]
         
@@ -176,11 +176,8 @@ def export_json(request, is_tf=False):
                     processedLayer[layerId] = True
                     processedLayer[idNext] = True
                 else:
-                    if net[layerId]['connection']['input'] and net[net[layerId]['connection']['input'][0]]['info']['type'] in ['TimeDistributed', 'Bidirectional']:
-                        pass
-                    else:
-                        net_out.update(layer_map[net[layerId]['info']['type']](
-                            net[layerId], layer_in, layerId))
+                    net_out.update(layer_map[net[layerId]['info']['type']](
+                        net[layerId], layer_in, layerId))
                 for outputId in net[layerId]['connection']['output']:
                     if outputId not in stack:
                         stack.append(outputId)

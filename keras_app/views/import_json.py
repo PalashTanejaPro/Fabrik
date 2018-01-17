@@ -131,7 +131,16 @@ def import_json(request):
         wrapped = False
         if (class_name in layer_map):
             # This is to handle wrappers and the wrapped layers.
-            if class_name in ['Bidirectional', 'TimeDistributed']:
+            if class_name == 'InputLayer':
+                for find_layer in model.layers:
+                    if len(find_layer.inbound_nodes[0].inbound_layers):
+                        if find_layer.inbound_nodes[0].inbound_layers[0].__class__.__name__ == 'InputLayer':
+                            net[layer.name] = Input(layer)
+                            net[layer.name]['connection']['output'] = [find_layer.name]
+                            print find_layer.name
+                            break
+                        
+            elif class_name in ['Bidirectional', 'TimeDistributed']:
                 net[layer.name] = layer_map[class_name](layer)
                 wrapped_layer = layer.get_config()['layer']
                 name = wrapped_layer['config']['name']
