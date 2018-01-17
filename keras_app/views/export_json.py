@@ -3,8 +3,6 @@ import os
 import random
 import string
 import yaml
-import json
-import traceback
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
