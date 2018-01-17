@@ -393,8 +393,8 @@ class Pane extends React.Component {
                 </div>
                 <div id="wrapper" className="panel-collapse collapse" role="tabpanel">
                   <div className="panel-body">
-                    <PaneElement handleClick={this.props.handleClick} id="TimeDistributed">Time Distributed</PaneElement>
-                    <PaneElement handleClick={this.props.handleClick} id="Bidirectional">Bidirectional</PaneElement>
+                    <PaneElement handleClick={this.props.handleClick} setDraggingLayer={this.props.setDraggingLayer} id="TimeDistributed">Time Distributed</PaneElement>
+                    <PaneElement handleClick={this.props.handleClick} setDraggingLayer={this.props.setDraggingLayer} id="Bidirectional">Bidirectional</PaneElement>
                   </div>
                 </div>
               </div>
