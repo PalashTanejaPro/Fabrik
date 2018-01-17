@@ -78,7 +78,7 @@ def dense(layer, layer_in, layerId, tensor=True):
                          kernel_constraint=kernel_constraint, use_bias=use_bias,
                          bias_initializer=bias_initializer)
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -117,14 +117,14 @@ def activation(layer, layer_in, layerId, tensor=True):
 def dropout(layer, layer_in, layerId, tensor=True):
     out = {layerId: Dropout(0.5)}
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
 def flatten(layer, layer_in, layerId, tensor=True):
     out = {layerId: Flatten()}
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -132,21 +132,21 @@ def reshape(layer, layer_in, layerId, tensor=True):
     shape = map(int, layer['params']['dim'].split(','))
     out = {layerId: Reshape(shape[2:]+shape[1:2])}
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
 def permute(layer, layer_in, layerId, tensor=True):
     out = {layerId: Permute(map(int, layer['params']['dim'].split(',')))}
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
 def repeat_vector(layer, layer_in, layerId, tensor=True):
     out = {layerId: RepeatVector(layer['params']['n'])}
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -155,14 +155,14 @@ def regularization(layer, layer_in, layerId, tensor=True):
     l2 = layer['params']['l2']
     out = {layerId: ActivityRegularization(l1=l1, l2=l2)}
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
 def masking(layer, layer_in, layerId, tensor=True):
     out = {layerId: Masking(mask_value=layer['params']['mask_value'])}
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -232,7 +232,7 @@ def convolution(layer, layer_in, layerId, tensor=True):
                                        bias_constraint=bias_constraint,
                                        kernel_constraint=kernel_constraint)
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 # Separable Convolution is currently not supported with Theano backend
@@ -310,7 +310,7 @@ def deconvolution(layer, layer_in, layerId, tensor=True):
                                    bias_constraint=bias_constraint,
                                    kernel_constraint=kernel_constraint)
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -331,7 +331,7 @@ def upsample(layer, layer_in, layerId, tensor=True):
                 layer['params']['size_d'])
     out[layerId] = upsampleMap[layer_type](size=size)
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -378,7 +378,7 @@ def pooling(layer, layer_in, layerId, tensor=True):
             layer_in = [out[layerId + 'Pad']]
     out[layerId] = poolMap[(layer_type, pool_type)](pool_size=kernel, strides=strides, padding=padding)
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -414,7 +414,7 @@ def locally_connected(layer, layer_in, layerId, tensor=True):
                                         bias_constraint=bias_constraint,
                                         kernel_constraint=kernel_constraint)
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -484,7 +484,7 @@ def recurrent(layer, layer_in, layerId, tensor=True):
                                  use_bias=use_bias, dropout=dropout,
                                  recurrent_dropout=recurrent_dropout)
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -508,7 +508,7 @@ def embed(layer, layer_in, layerId, tensor=True):
                              embeddings_constraint=embeddings_constraint,
                              mask_zero=mask_zero, input_length=input_length)
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -539,7 +539,7 @@ def gaussian_noise(layer, layer_in, layerId, tensor=True):
     stddev = layer['params']['stddev']
     out = {layerId: GaussianNoise(stddev=stddev)}
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -547,7 +547,7 @@ def gaussian_dropout(layer, layer_in, layerId, tensor=True):
     rate = layer['params']['rate']
     out = {layerId: GaussianDropout(rate=rate)}
     if tensor:
-        out[layerId](*layer_in)
+       out[layerId] = out[layerId](*layer_in)
     return out
 
 
@@ -556,7 +556,7 @@ def alpha_dropout(layer, layer_in, layerId, tensor=True):
     seed = layer['params']['seed']
     out = {layerId: AlphaDropout(rate=rate, seed=seed)}
     if tensor:
-        out[layerId](*layer_in)
+        out[layerId] = out[layerId](*layer_in)
     return out
 
 

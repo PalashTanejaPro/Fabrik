@@ -136,8 +136,8 @@ def import_json(request):
                     if len(find_layer.inbound_nodes[0].inbound_layers):
                         if find_layer.inbound_nodes[0].inbound_layers[0].__class__.__name__ == 'InputLayer':
                             net[layer.name] = Input(layer)
-                            net[layer.name]['connection']['output'] = [find_layer.name]
-                            print find_layer.name
+                            if find_layer.__class__.__name__ in ['Bidirectional', 'TimeDistributed']:
+                                net[layer.name]['connection']['output'] = [find_layer.name]
                             break
                         
             elif class_name in ['Bidirectional', 'TimeDistributed']:

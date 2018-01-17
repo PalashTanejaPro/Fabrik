@@ -96,7 +96,7 @@ def export_json(request, is_tf=False):
         for i in redundant_layers:
             del net[i]
         
-        # Check if conversion is possible
+        # Check if conversion is possibled
         error = []
         for layerId in net:
             layerType = net[layerId]['info']['type']
