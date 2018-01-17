@@ -77,7 +77,7 @@ def export_json(request, is_tf=False):
             'Bidirectional': bidirectional
         }
 
-        #Remove any duplicate activation layers (timedistributed and bidirectional layers)
+        # Remove any duplicate activation layers (timedistributed and bidirectional layers)
         redundant_layers = []
         for layerId in net:
             if net[layerId]['connection']['input'] and net[net[layerId]['connection']['input'][0]]['info']['type'] in ['TimeDistributed', 'Bidirectional']:
@@ -87,7 +87,8 @@ def export_json(request, is_tf=False):
                 if len(outputs) > 0:
                     net[layerId]['connection']['output'] = outputs
                     for j in outputs:
-                        net[j]['connection']['input'] = [x  if (x != target) else layerId for x in net[j]['connection']['input'] ]
+                        net[j]['connection']['input'] = [
+                            x if (x != target) else layerId for x in net[j]['connection']['input']]
                     redundant_layers.append(target)
             elif net[layerId]['info']['type'] == 'Input' and net[net[layerId]['connection']['output'][0]]['info']['type'] in ['TimeDistributed', 'Bidirectional']:
                 connected_layer = net[layerId]['connection']['output'][0]
@@ -95,7 +96,7 @@ def export_json(request, is_tf=False):
                 print net[connected_layer]['params']['batch_input_shape']
         for i in redundant_layers:
             del net[i]
-        
+
         # Check if conversion is possibled
         error = []
         for layerId in net:
@@ -112,8 +113,8 @@ def export_json(request, is_tf=False):
         stack = []
         net_out = {}
         dataLayers = ['ImageData', 'Data', 'HDF5Data', 'Input', 'WindowData',
-                      'MemoryData', 'DummyData', 'Bidirectional', 
-                       'TimeDistributed' ]
+                      'MemoryData', 'DummyData', 'Bidirectional',
+                      'TimeDistributed']
         processedLayer = {}
         inputLayerId = []
         outputLayerId = []
@@ -172,7 +173,8 @@ def export_json(request, is_tf=False):
                     idNext = net[layerId]['connection']['output'][0]
                     net_out.update(
                         layer_map[net[layerId]['info']['type']](layerId, idNext, net, layer_in, layer_map))
-                    net[net[idNext]['connection']['output'][0]]['connection']['input'] = [layerId]
+                    net[net[idNext]['connection']['output'][0]
+                        ]['connection']['input'] = [layerId]
                     processedLayer[layerId] = True
                     processedLayer[idNext] = True
                 else:
