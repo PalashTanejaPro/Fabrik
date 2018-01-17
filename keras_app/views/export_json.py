@@ -3,6 +3,7 @@ import os
 import random
 import string
 import yaml
+import json
 import traceback
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
@@ -76,6 +77,25 @@ def export_json(request, is_tf=False):
             'Bidirectional': bidirectional
         }
 
+        #Remove any duplicate activation layers (timedistributed and bidirectional layers)
+        redundant_layers = []
+        for layerId in net:
+            if net[layerId]['connection']['input'] and net[net[layerId]['connection']['input'][0]]['info']['type'] in ['TimeDistributed', 'Bidirectional']:
+                target = net[layerId]['connection']['output'][0]
+                print net[target]['info']['type']
+                outputs = net[target]['connection']['output']
+                if len(outputs) > 0:
+                    net[layerId]['connection']['output'] = outputs
+                    for j in outputs:
+                        net[j]['connection']['input'] = [x  if (x != target) else layerId for x in net[j]['connection']['input'] ]
+                    redundant_layers.append(target)
+            elif net[layerId]['info']['type'] == 'Input' and net[net[layerId]['connection']['output'][0]]['info']['type'] in ['TimeDistributed', 'Bidirectional']:
+                connected_layer = net[layerId]['connection']['output'][0]
+                net[connected_layer]['params']['batch_input_shape'] = net[layerId]['params']['dim']
+
+        for i in redundant_layers:
+            del net[i]
+        
         # Check if conversion is possible
         error = []
         for layerId in net:
@@ -92,7 +112,8 @@ def export_json(request, is_tf=False):
         stack = []
         net_out = {}
         dataLayers = ['ImageData', 'Data', 'HDF5Data', 'Input', 'WindowData',
-                      'MemoryData', 'DummyData']
+                      'MemoryData', 'DummyData', 'Bidirectional', 
+                       'TimeDistributed' ]
         processedLayer = {}
         inputLayerId = []
         outputLayerId = []
@@ -155,7 +176,7 @@ def export_json(request, is_tf=False):
                     processedLayer[layerId] = True
                     processedLayer[idNext] = True
                 else:
-                    if net[layerId]['connection']['input'] and net[layerId]['connection']['input'][0] in ['TimeDistributed', 'Bidirectional']:
+                    if net[layerId]['connection']['input'] and net[net[layerId]['connection']['input'][0]]['info']['type'] in ['TimeDistributed', 'Bidirectional']:
                         pass
                     else:
                         net_out.update(layer_map[net[layerId]['info']['type']](
