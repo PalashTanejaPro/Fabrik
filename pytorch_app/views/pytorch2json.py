@@ -1,10 +1,6 @@
 import keras
-import sys
 import numpy as np
-import math
-
 import torch
-import torch.nn as nn
 from torch.autograd import Variable
 from layers_import_process import pytorch_to_keras
 
@@ -24,6 +20,8 @@ output_dir = args.output_file
 model = torch.load(model_dir)
 for m in model.modules():
     m.training = False
+
+dummy_model = keras.models.Sequential()
 
 input_np = np.random.uniform(0, 1, (1, 3, 224, 224))
 input_var = Variable(torch.FloatTensor(input_np))

@@ -6,7 +6,6 @@ import requests
 from datetime import datetime
 import random
 import string
-from keras_app.views.import_json import import_json
 
 
 def randomword(length):
