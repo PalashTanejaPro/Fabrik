@@ -140,9 +140,9 @@ def import_json(request):
                             if find_layer.__class__.__name__ in ['Bidirectional', 'TimeDistributed']:
                                 net[layer.name]['connection']['output'] = [
                                     find_layer.name]
-                                found=1
+                                found = 1
                                 break
-                if not found:            
+                if not found:
                     net[layer.name] = Input(layer)
 
             elif class_name in ['Bidirectional', 'TimeDistributed']:
