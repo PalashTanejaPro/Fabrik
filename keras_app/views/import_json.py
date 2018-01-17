@@ -132,6 +132,7 @@ def import_json(request):
         if (class_name in layer_map):
             # This is to handle wrappers and the wrapped layers.
             if class_name == 'InputLayer':
+                found = 0
                 for find_layer in model.layers:
                     if len(find_layer.inbound_nodes[0].inbound_layers):
                         if find_layer.inbound_nodes[0].inbound_layers[0].__class__.__name__ == 'InputLayer':
@@ -139,7 +140,10 @@ def import_json(request):
                             if find_layer.__class__.__name__ in ['Bidirectional', 'TimeDistributed']:
                                 net[layer.name]['connection']['output'] = [
                                     find_layer.name]
-                            break
+                                found=1
+                                break
+                if not found:            
+                    net[layer.name] = Input(layer)
 
             elif class_name in ['Bidirectional', 'TimeDistributed']:
                 net[layer.name] = layer_map[class_name](layer)
