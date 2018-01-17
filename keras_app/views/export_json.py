@@ -79,7 +79,8 @@ def export_json(request, is_tf=False):
         redundant_layers = []
         for layerId in net:
             if (net[layerId]['connection']['input']
-                    and net[net[layerId]['connection']['input'][0]]['info']['type'] in ['TimeDistributed', 'Bidirectional']):
+                    and net[net[layerId]['connection']['input'][0]]['info']['type'] in
+                    ['TimeDistributed', 'Bidirectional']):
                 target = net[layerId]['connection']['output'][0]
                 print net[target]['info']['type']
                 outputs = net[target]['connection']['output']
@@ -90,7 +91,8 @@ def export_json(request, is_tf=False):
                             x if (x != target) else layerId for x in net[j]['connection']['input']]
                     redundant_layers.append(target)
             elif (net[layerId]['info']['type'] == 'Input'
-                  and net[net[layerId]['connection']['output'][0]]['info']['type'] in ['TimeDistributed', 'Bidirectional']):
+                  and net[net[layerId]['connection']['output'][0]]['info']['type'] in
+                  ['TimeDistributed', 'Bidirectional']):
                 connected_layer = net[layerId]['connection']['output'][0]
                 net[connected_layer]['params']['batch_input_shape'] = net[layerId]['params']['dim']
                 print net[connected_layer]['params']['batch_input_shape']
