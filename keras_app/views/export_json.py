@@ -81,15 +81,15 @@ def export_json(request, is_tf=False):
             if (net[layerId]['connection']['input']
                     and net[net[layerId]['connection']['input'][0]]['info']['type'] in
                     ['TimeDistributed', 'Bidirectional']):
-                target = net[layerId]['connection']['output'][0]
-                print net[target]['info']['type']
-                outputs = net[target]['connection']['output']
-                if len(outputs) > 0:
-                    net[layerId]['connection']['output'] = outputs
-                    for j in outputs:
-                        net[j]['connection']['input'] = [
-                            x if (x != target) else layerId for x in net[j]['connection']['input']]
-                    redundant_layers.append(target)
+                if len(net[layerId]['connection']['output'])>0:
+                    target = net[layerId]['connection']['output'][0]
+                    outputs = net[target]['connection']['output']
+                    if len(outputs) > 0:
+                        net[layerId]['connection']['output'] = outputs
+                        for j in outputs:
+                            net[j]['connection']['input'] = [
+                                x if (x != target) else layerId for x in net[j]['connection']['input']]
+                        redundant_layers.append(target)
             elif (net[layerId]['info']['type'] == 'Input'
                   and net[net[layerId]['connection']['output'][0]]['info']['type'] in
                   ['TimeDistributed', 'Bidirectional']):
@@ -175,10 +175,11 @@ def export_json(request, is_tf=False):
                     idNext = net[layerId]['connection']['output'][0]
                     net_out.update(
                         layer_map[net[layerId]['info']['type']](layerId, idNext, net, layer_in, layer_map))
-                    net[net[idNext]['connection']['output'][0]
+                    if len(net[idNext]['connection']['output'])>0:
+                        net[net[idNext]['connection']['output'][0]
                         ]['connection']['input'] = [layerId]
-                    processedLayer[layerId] = True
                     processedLayer[idNext] = True
+                    processedLayer[layerId] = True
                 else:
                     net_out.update(layer_map[net[layerId]['info']['type']](
                         net[layerId], layer_in, layerId))
