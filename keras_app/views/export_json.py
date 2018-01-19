@@ -81,7 +81,7 @@ def export_json(request, is_tf=False):
             if (net[layerId]['connection']['input']
                     and net[net[layerId]['connection']['input'][0]]['info']['type'] in
                     ['TimeDistributed', 'Bidirectional']):
-                if len(net[layerId]['connection']['output'])>0:
+                if len(net[layerId]['connection']['output']) > 0:
                     target = net[layerId]['connection']['output'][0]
                     outputs = net[target]['connection']['output']
                     if len(outputs) > 0:
@@ -175,9 +175,9 @@ def export_json(request, is_tf=False):
                     idNext = net[layerId]['connection']['output'][0]
                     net_out.update(
                         layer_map[net[layerId]['info']['type']](layerId, idNext, net, layer_in, layer_map))
-                    if len(net[idNext]['connection']['output'])>0:
+                    if len(net[idNext]['connection']['output']) > 0:
                         net[net[idNext]['connection']['output'][0]
-                        ]['connection']['input'] = [layerId]
+                            ]['connection']['input'] = [layerId]
                     processedLayer[idNext] = True
                     processedLayer[layerId] = True
                 else:
