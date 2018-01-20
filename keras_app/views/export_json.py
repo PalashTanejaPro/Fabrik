@@ -95,7 +95,6 @@ def export_json(request, is_tf=False):
                   ['TimeDistributed', 'Bidirectional']):
                 connected_layer = net[layerId]['connection']['output'][0]
                 net[connected_layer]['params']['batch_input_shape'] = net[layerId]['params']['dim']
-                print net[connected_layer]['params']['batch_input_shape']
         for i in redundant_layers:
             del net[i]
 
