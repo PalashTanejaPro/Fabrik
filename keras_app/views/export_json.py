@@ -200,10 +200,10 @@ def export_json(request, is_tf=False):
             final_input.append(net_out[i])
 
         for j in outputLayerId:
-            if net[net[j]['connection']['input'][0]]['info']['type'] in ['TimeDistributed', 'Bidirectional']:
-                print "got em"
+            if net[net[j]['connection']['input'][0]]['info']['type'] in
+            ['TimeDistributed', 'Bidirectional']:
                 final_output.append(net_out[net[j]['connection']['input'][0]])
-            else:    
+            else:
                 final_output.append(net_out[j])
 
         model = Model(inputs=final_input, outputs=final_output, name=net_name)
